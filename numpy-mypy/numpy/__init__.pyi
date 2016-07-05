@@ -1,10 +1,10 @@
-from typing import Any, Dict, Iterator, List, Optional, Sequence, Tuple, Union
+from typing import Any, Generic, Iterator, List, Optional, Sequence, Tuple, TypeVar, Union, io
 
 class dtype: ...
 _dtype_alias = dtype
 
 
-class flagsobj(Dict[str, bool]):
+class flagsobj:
     aligned = None       # type: bool
     behaved = None       # type: bool
     c_contiguous = None  # type: bool
@@ -18,6 +18,7 @@ class flagsobj(Dict[str, bool]):
     owndata = None       # type: bool
     updateifcopy = None  # type: bool
     writeable = None     # type: bool
+    def __getitem__(self, item: str) -> bool: ...
 
 
 # TODO Complete scalar hierarchy
@@ -27,7 +28,13 @@ class object_(generic): ...
 class number(generic): ...
 class flexible(generic): ...
 
-class ndarray:
+AxesType = Union[int, Tuple[int, ...]]
+
+S = TypeVar('S')
+U = TypeVar('U')
+NdarrayLike = TypeVar('NdarrayLike', bound='ndarray')
+
+class ndarray(Generic[S]):
     T = None         # type: ndarray
     data = None      # type: Any
     dtype = None     # type: _dtype_alias
@@ -127,54 +134,57 @@ class ndarray:
     def __truediv__(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define __truediv__
     def __xor__(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define __xor__
 
-    def all(self, axis: Optional[Union[int, Tuple[int, ...]]]=None, out: Optional['ndarray']=None,
+    def all(self, axis: Optional[AxesType]=None, out: Optional['ndarray[U]]']=None,
+            keepdims: Optional[bool]=None) -> Union['ndarray[U]', 'ndarray[bool]', bool]: ...
+
+    def any(self, axis: Optional[AxesType]=None, out: Optional['ndarray']=None,
             keepdims: Optional[bool]=None) -> Union['ndarray', bool]: ...
 
-    def any(self, axis: Optional[Union[int, Tuple[int, ...]]]=None, out: Optional['ndarray']=None,
-            keepdims: Optional[bool]=None) -> Union['ndarray', bool]: ...
+    def argmax(self, axis: Optional[int]=None,
+               out: Optional['ndarray[U]']=None) -> Union['ndarray[int]', 'ndarray[U]', int]: ...
 
-    def argmax(self, axis: Optional[int]=None, out: Optional['ndarray']=None) -> 'ndarray': ...
-
-    def argmin(self, axis: Optional[int]=None, out: Optional['ndarray']=None) -> 'ndarray': ...
+    def argmin(self, axis: Optional[int]=None,
+               out: Optional['ndarray[U]']=None) -> Union['ndarray[int]', 'ndarray[U]', int]: ...
 
     def argpartition(self, kth: Union[int, Sequence[int]], axis: Optional[int]=-1,
                      kind: Optional[str]='introselect',
-                     order: Optional[str, List[str]]=None) -> Union['ndarray', int]: ...
+                     order: Optional[str, List[str]]=None) -> 'ndarray[int]': ...
 
     def argsort(self, axis: Optional[int]=None, kind: Optional[str]='quicksort',
-                order: Optional[str, List[str]]=None) -> Union['ndarray', int]: ...
+                order: Optional[str, List[str]]=None) -> 'ndarray[int]': ...
 
     def astype(self, dtype: Union[str, _dtype_alias], order: Optional[str]='K',
                casting: Optional[str]='unsafe', subok: Optional[bool]=None,
-               copy: Optional[bool]=None) -> 'ndarray': ...
+               copy: Optional[bool]=None) -> 'ndarray[Any]': ...  # TODO not entirely sure how to express the relation between dtype and return value
 
-    def byteswap(self, inplace: Optional[bool]=False) -> 'ndarray': ...
+    def byteswap(self, inplace: Optional[bool]=False) -> 'ndarray[S]': ...
 
-    def choose(self, choices:Sequence['ndarray'], out: Optional['ndarray']=None,  # TODO verify if choices can be anything other than 'ndarray'
-               mode: Optional['str']='raise') -> 'ndarray': ...
+    def choose(self, choices:Sequence['ndarray[Any]'], out: Optional['ndarray[U]']=None,  # TODO verify if choices can be anything other than 'ndarray'
+               mode: Optional['str']='raise') -> 'ndarray[U]': ...
 
-    def clip(self, a_min: Union[generic, 'ndarray'], a_max: Union[generic, 'ndarray'],
-             out: Optional['ndarray']=None) -> 'ndarray': ...
+    def clip(self, a_min: Union[generic, 'ndarray[Any]'], a_max: Union[generic, 'ndarray[Any]'],
+             out: Optional['ndarray[U]']=None) -> Union['ndarray[S]', 'ndarray[U]']: ...  # TODO don't know what to do with a_min and a_max
 
-    def compress(self, condition: Any, axis: Optional[int]=None,  # TODO figure out a way to express condition
+    def compress(self, condition: [Sequence[bool], 'ndarray[bool]'], axis: Optional[int]=None,
                  out: Optional['ndarray']=None) -> 'ndarray': ...
 
-    def conj(self) -> 'ndarray': ...  # TODO there are no docs. verify interface and semantics.
+    def conj(self) -> 'ndarray[S]': ...  # TODO there are no docs. verify interface and semantics.
 
-    def conjugate(self) -> 'ndarray': ...  # TODO there are no docs. verify interface and semantics.
+    def conjugate(self) -> 'ndarray[S]': ...  # TODO there are no docs. verify interface and semantics.
 
-    def copy(self, order: Optional['str']='C') -> 'ndarray': ...
+    def copy(self, order: Optional['str']='C') -> 'ndarray[S]': ...
 
     def cumprod(self, axis: Optional[int]=None, dtype: Optional[_dtype_alias]=None,
-                out: Optional['ndarray']=None) -> 'ndarray': ...
+                out: Optional['ndarray[Any]']=None) -> 'ndarray[Any]': ...  # TODO figure out a way to express relationship between dtype and return value
 
     def cumsum(self, axis: Optional[int]=None, dtype: Optional[_dtype_alias]=None,
-                out: Optional['ndarray']=None) -> 'ndarray': ...
+                out: Optional['ndarray[ANY]']=None) -> 'ndarray[Any]': ...  # TODO figure out a way to express relationship between dtype and return value
 
     def diagonal(self, offset: Optional[int]=0, axis1: Optional[int]=0,
-                 axis2: Optional[int]=1) -> 'ndarray': ...
+                 axis2: Optional[int]=1) -> 'ndarray[S]': ...
 
-    def dot(self, b: 'ndarray', out: Optional['ndarray']=None) -> 'ndarray': ...
+    def dot(self, b: 'ndarray[S]',
+            out: Optional['ndarray[U]']=None) -> Union['ndarray[S]', 'ndarray[U]']: ...
 
     def dump(self, file: 'str') -> None: ...
 
@@ -182,50 +192,94 @@ class ndarray:
 
     def fill(self, value: generic) -> None: ...
 
-    def flatten(self, order: Optional[str]='C') -> 'ndarray': ...
+    def flatten(self, order: Optional[str]='C') -> 'ndarray[S]': ...
 
-    def getfield(self, dtype: _dtype_alias, offset: Optional[int]=0) -> 'ndarray': ...  # TODO documentation is incomplete. validate signature.
+    def getfield(self, dtype: _dtype_alias, offset: Optional[int]=0) -> 'ndarray[_dtype_alias]': ...  # TODO documentation is incomplete. validate signature.
 
-    def item(self, args: Optional[Union[int, Tuple[int, ...]]]) -> Any: ...  # TODO verify this signature
+    def item(self, args: Optional[Union[int, Tuple[int, ...]]]) -> generic: ...  # TODO verify this signature
 
     def itemset(self, arg0: Union[int, Tuple[int, ...]], arg1: Optional[generic]=None) -> None: ...  # TODO verify this signature
 
     def max(self, axis: Optional[Union[int, Tuple[int, ...]]]=None,
-            out: Optional['ndarray']=None) -> Union['ndarray', generic]: ...
+            out: Optional['ndarray[U]]']=None) -> Union['ndarray[S]', 'ndarray[U]', generic]: ...
 
     def mean(self, axis: Optional[Union[int, Tuple[int, ...]]]=None,
-             dtype: Optional[_dtype_alias]=None, out=Optional['ndarray'],
-             keepdims: Optional[bool]=False) -> 'ndarray': ...
+             dtype: Optional[_dtype_alias]=None, out=Optional['ndarray[U]'],
+             keepdims: Optional[bool]=False) -> Union['ndarray[U]', 'ndarray[_dtype_alias]', 'ndarray[S]']: ...
 
     def min(self, axis: Optional[Union[int, Tuple[int, ...]]]=None,
-            out: Optional['ndarray']=None) -> Union['ndarray', generic]: ...
+            out: Optional['ndarray[U]]']=None) -> Union['ndarray[S]', 'ndarray[U]', generic]: ...
 
-    def newbyteorder(self, new_order: Optional['str']='S') -> 'ndarray': ...
+    def newbyteorder(self, new_order: Optional['str']='S') -> 'ndarray[Any]': ...  # TODO verify the return value type changes
 
-    def nonzero(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define nonzero
-    def partition(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define partition
-    def prod(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define prod
-    def ptp(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define ptp
-    def put(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define put
-    def ravel(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define ravel
-    def repeat(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define repeat
-    def reshape(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define reshape
-    def resize(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define resize
-    def round(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define round
-    def searchsorted(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define searchsorted
-    def setfield(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define setfield
-    def setflags(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define setflags
-    def sort(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define sort
-    def squeeze(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define squeeze
-    def std(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define std
-    def sum(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define sum
-    def swapaxes(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define swapaxes
-    def take(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define take
-    def tobytes(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define tobytes
-    def tofile(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define tofile
-    def tolist(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define tolist
-    def tostring(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define tostring
-    def trace(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define trace
-    def transpose(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define transpose
-    def var(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define var
-    def view(self, *args: Any, **kwargs: Any) -> Any: ...  # TODO define view
+    def nonzero(self) -> 'ndarray[int]': ...
+
+    def partition(self, kth: AxesType, axis: Optional[int]=-1, kind: Optional[str]='introselect',
+                  order: Optional[Union[Sequence[str], str]]=None) -> None: ...
+
+    def prod(self, axis: Optional[AxesType]=None, dtype: Optional[_dtype_alias]=None,
+             out: Optional['ndarray[U]]']=None, keepdims: Optional[bool]=False) -> Union['ndarray[S]', 'ndarray[U]', 'ndarray[_dtype_alias]']: ...
+
+    def ptp(self, axis: Optional[int]=None,
+            out: Optional['ndarray[U]']=None) -> Union['ndarray[S]', 'ndarray[U]']: ...
+
+    def put(self, ind: Any, v: Any, mode: Optional[str]='raise') -> None: ...  # TODO figure out a way to express "array-like" ind and v
+
+    def ravel(self, order: Optional[str]='C') -> 'ndarray[S]': ...  # TODO verify return value
+
+    def repeat(self, repeats: Union[int, Sequence[int]],
+               axis: Optional[int]=None) -> 'ndarray[S]': ...
+
+    def reshape(self, newshape: Union[int, Tuple[int]],
+                order: Optional[str]='C') -> 'ndarray[S]': ...
+
+    def resize(self, new_shape: Union[int, Tuple[int]], refcheck: Optional[bool]=True) -> None: ...
+
+    def round(self, decimals: int=0,
+              out: Optional['ndarray[U]']=None) -> Union['ndarray[S]', 'ndarray[U]']: ...
+
+    def searchsorted(self, v: Any, side: Optional[str]='left',
+                     sorter: Optional[Any]=None) -> 'ndarray[int]': ...  # TODO find a way to describe v and sorter
+
+    def setfield(self, val: Any, dtype: _dtype_alias, offset: Optional[int]=0) -> None: ...
+
+    def setflags(self, write: Optional[bool]=None, align: Optional[bool]=None,
+                 uic: Optional[bool]=None) -> None: ...
+
+    def sort(self, axis: Optional[int]=-1, kind: Optional[str]='quicksort',
+             order: Optional[Union[str, Sequence[str]]]=None) -> None: ...
+
+    def squeeze(self, axis: Optional[AxesType]) -> 'ndarray[S]': ...
+
+    def std(self, axis: Optional[AxesType]=None, dtype=Optional[_dtype_alias],
+            out=Optional['ndarray[U]'], ddof: Optional[int]=0,
+            keepdims: Optional[bool]=False) -> Union['ndarray[U]', 'ndarray[_dtype_alias]', 'ndarray[S]']: ...
+
+    def sum(self, axis: Optional[AxesType]=None, dtype=Optional[_dtype_alias],
+            out: Optional['ndarray[U]']=None, keepdims: Optional[bool]=False) -> Union['ndarray[U]', 'ndarray[_dtype_alias]', 'ndarray[S]']: ...
+
+    def swapaxes(self, axis1: int, axis2: int) -> 'ndarray[S]': ...
+
+    def take(self, indices: Any, axis: Optional[int]=None, out: Optional['ndarray[U]']=None,
+             mode: Optional[str]='raise') -> Union['ndarray[U]', 'ndarray[S]']: ...
+
+    def tobytes(self, order: Optional[str]='C') -> bytes: ...
+
+    def tofile(self, fid: Union[io.BinaryIO, str], sep: Optional[str]="",
+               format: Optional[str]="%s") -> None: ...
+
+    def tolist(self) -> List[Any]: ...
+
+    def tostring(self, order: Optional[str]='C') -> bytes: ...
+
+    def trace(self, offset: Optional[int]=0, axis1: Optional[int]=0, axis2: Optional[int]=1,
+              dtype=Optional[_dtype_alias], out=Optional['ndarray[U]']) -> Union['ndarray[U]', 'ndarray[_dtype_alias]', 'ndarray[S]']: ...  # TODO define trace
+
+    def transpose(self, args0: Optional[Union[int, Tuple[int]]], *args: int) -> 'ndarray[S]': ...
+
+    def var(self, axis: Optional[AxesType]=None, dtype=Optional[_dtype_alias],
+            out=Optional['ndarray[U]'], ddof: Optional[int]=0,
+            keepdims: Optional[bool]=False) -> Union['ndarray[U]', 'ndarray[_dtype_alias]', 'ndarray[S]']: ...
+
+    def view(self, dtype=Optional[Union[_dtype_alias, NdarrayLike]],
+             type: Optional[U]=None) -> Union['ndarray[_dtype_alias]', NdarrayLike, 'ndarray[U]']: ...
