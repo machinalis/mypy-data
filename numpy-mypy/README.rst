@@ -5,18 +5,20 @@ numpy-mypy
 Introduction
 ------------
 
-This package contains the `MyPy <http://www.mypy-lang.org/>`_ type stub for the `NumPy <http://www.numpy.org/>`_ scientific package.
+This package contains the `MyPy <http://www.mypy-lang.org/>`_ type stubs for the `NumPy <http://www.numpy.org/>`_ scientific package.
 
-So far, only `ndarray <http://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html>`_, `scalars <http://docs.scipy.org/doc/numpy/reference/arrays.scalars.html#scalars>`_, and `array creation routines <http://docs.scipy.org/doc/numpy/reference/routines.array-creation.html#array-creation-routines>`_ are covered, but we think it's enough to get you started on type checking programs that depend on ``numpy.``
+So far, only `ndarrays <http://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html>`_, `scalars <http://docs.scipy.org/doc/numpy/reference/arrays.scalars.html#scalars>`_, and `array creation routines <http://docs.scipy.org/doc/numpy/reference/routines.array-creation.html#array-creation-routines>`_ are covered, but we think it's enough to get you started on type checking programs that depend on ``numpy``.
 
 Usage
 -----
 
 We've defined the interface for ``numpy.ndarray`` with a type parameter that allows developers to declare the type of scalars that each cell contains: ::
 
-  my_array = numpy.ndarray([1,2,3])  # type numpy.ndarray[int]
+.. code-block:: python
 
-Afterwards you can operate with the array as usual. For the moment, due to some limitations (listed below), you'll have to declare the type of the array explicitly.
+  my_array = numpy.ndarray([1,2,3])  # type: numpy.ndarray[int]
+
+Afterwards you can operate with the array as usual. For the moment being, due to some limitations (listed below), you'll have to declare the type of the array explicitly.
 
 In order to run mypy against your numpy based code, you need to download the numpy-mypy stub and put its contents in a folder (we recommend naming the folder ``stubs`` as per mypy's documentation suggestion). Once there, you can check your code setting the ``MYPYPATH`` environment variable: ::
 
@@ -28,7 +30,7 @@ Limitations
 
 As we mentioned in the introduction, not all the package has types signatures yet, but we'll keep adding them in subsequent releases.
 
-Quite a few numpy methods are incredibly flexible and they do their best to accommodate to any possible argument combination. Most of the problems are solved behind the scenes and a sensible response is almost always given. Although this is great for users, is causes a lot of problems when trying to define the type signature for those methods. In these cases we tried to give the user the chance of being explicit with their intentions. For instance, the ``array`` function is used to create arrays, and its first argument is an arbitrary "array-like" object. You can pass pretty much anything as the ``object`` argument: ::
+Quite a few numpy methods are incredibly flexible and they do their best to accommodate to any possible argument combination. Most of these problems are solved behind the scenes and a sensible response is almost always given. Although this is great for users, it caused us a lot of problems when trying to describe the type signature for those methods. In those cases we opted to give the user the chance of being explicit with their intentions. For instance, the ``array`` function is used to create arrays, and its first argument is an arbitrary "array-like" object. You can pass pretty much anything as the ``object`` argument: ::
 
   In [1]: import numpy as np
 
@@ -52,9 +54,9 @@ As you can see, you give "something" to ``array``, and it manages to build an ar
 
   my_array = numpy.array([1.0, 2.0, 3.0])  # type: numpy.array[float]
 
-and all other methods signatures were written trying to mantain as much type information as possible.
+Most methods signatures were written trying to maintain as much type information as possible.
 
-There are some mypy `issues <https://github.com/python/mypy/issues/1907>`_ that prevent us from writing smarted type signatures. Once those are resolved, we'll be able to expose more type information to mypy which, will make it easier to keep track of the type of scalars stored in the arrays.
+There are some mypy `issues <https://github.com/python/mypy/issues/1907>`_ that prevent us from writing smarter type signatures. Once those are resolved, we'll be able to expose more type information to mypy which, will make it easier to keep track of the type of scalars stored in the arrays and have stricter checking. For the time being, we designed this to prefer "when in doubt, allow it" rather than "when in doubt, forbid it", so some invalid operations may pass uncaught.
 
 Feedback
 --------
