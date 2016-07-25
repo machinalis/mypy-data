@@ -34,6 +34,7 @@ class flagsobj:
 
 _S = TypeVar('_S')
 _U = TypeVar('_U')
+_V = TypeVar('_V')
 
 #
 # Auxiliary types
@@ -102,8 +103,8 @@ class _ArrayLike(Generic[_S]):
 
     def byteswap(self, inplace: bool=False) -> '_ArrayLike[_S]': ...
 
-    def choose(self, choices:Sequence['_ArrayLike[Any]'], out: '_ArrayLike[Any]'=None,
-               mode: str='raise') -> '_ArrayLike[Any]': ...
+    def choose(self, choices:Sequence['_ArrayLike[_V]'], out: '_ArrayLike[_U]'=None,
+               mode: str='raise') ->  Union['_ArrayLike[_U]', '_ArrayLike[_V]']: ...
 
     def clip(self, a_min: Any, a_max: Any,
              out: '_ArrayLike[_U]'=None) -> Union['_ArrayLike[_S]', '_ArrayLike[_U]']: ...
