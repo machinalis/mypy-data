@@ -43,7 +43,6 @@ ShapeType = Union[int, Tuple[int, ...]]
 AxesType = Union[int, Tuple[int, ...]]
 OrderType = Union[str, Sequence[str]]
 DtypeType = Union[dtype, type]
-NdarrayLikeType = TypeVar('NdarrayLikeType', bound='ndarray')
 
 class _ArrayLike(Generic[_S]):
     """
@@ -223,7 +222,7 @@ class _ArrayLike(Generic[_S]):
     def var(self, axis: Optional[AxesType]=None, dtype=Optional[DtypeType],
             out=Optional['_ArrayLike[_U]'], ddof: Optional[int]=0, keepdims: Optional[bool]=False) -> '_ArrayLike[Any]': ...
 
-    def view(self, dtype: Optional[Union[DtypeType, Type[NdarrayLikeType]]]=None,
+    def view(self, dtype: Optional[Union[DtypeType, Type['ndarray']]]=None,
              type: Optional[type]=None) -> '_ArrayLike[Any]': ...
 
     #
