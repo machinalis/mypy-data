@@ -26,6 +26,7 @@ class flagsobj:
     updateifcopy = None  # type: bool
     writeable = None     # type: bool
     def __getitem__(self, item: str) -> bool: ...
+    def __setitem__(self, item: str, value: bool) -> None: ...
 
 #
 # Type variables. _T wasn't used to avoid confusions with ndarray's "T" attribute.
