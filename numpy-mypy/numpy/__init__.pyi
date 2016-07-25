@@ -44,6 +44,10 @@ AxesType = Union[int, Tuple[int, ...]]
 OrderType = Union[str, Sequence[str]]
 DtypeType = Union[dtype, type]
 
+class flatiter(Generic[_S], Iterator[_S]):
+    coords = ...  # type: ShapeType
+    def copy(self) -> flatiter[_S]: ...
+
 class _ArrayLike(Generic[_S]):
     """
     "array-like" interface that both numpy.ndarray and all scalars (descendants of numpy.generic)
@@ -56,7 +60,7 @@ class _ArrayLike(Generic[_S]):
     data = None      # type: Any
     dtype = None     # type: _dtype
     flags = None     # type: flagsobj
-    flat = None      # type: Iterator[_ArrayLike[_S]]
+    flat = None      # type: flatiter[_ArrayLike[_S]]
     imag = None      # type: _ArrayLike[_S]
     real = None      # type: _ArrayLike[_S]
     size = None      # type: int
