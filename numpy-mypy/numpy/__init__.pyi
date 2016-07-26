@@ -68,8 +68,8 @@ class _ArrayLike(Generic[_S]):
     itemsize = None  # type: int
     nbytes = None    # type: int
     ndim = None      # type: int
-    shape = None     # type: ShapeType
-    strides = None   # type: Tuple[int]
+    shape = None     # type: Tuple[int, ...]
+    strides = None   # type: Tuple[int, ...]
     base = None      # type: Optional[_ArrayLike[_S]]
 
     #
