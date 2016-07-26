@@ -12,11 +12,11 @@ So far, only `ndarrays <http://docs.scipy.org/doc/numpy/reference/generated/nump
 Usage
 -----
 
-We've defined the interface for ``numpy.ndarray`` with a type parameter that allows developers to declare the type of scalars that each cell contains: ::
+We've defined the interface for ``numpy.ndarray`` with a type parameter that allows developers to declare the type of scalars that each cell contains:
 
 .. code-block:: python
 
-  my_array = numpy.ndarray([1,2,3])  # type: numpy.ndarray[int]
+    my_array = numpy.ndarray([1,2,3])  # type: numpy.ndarray[int]
 
 Afterwards you can operate with the array as usual. For the moment being, due to some limitations (listed below), you'll have to declare the type of the array explicitly.
 
@@ -50,7 +50,9 @@ Quite a few numpy methods are incredibly flexible and they do their best to acco
   array(['1', '2', '3'],
         dtype='<U21')
 
-As you can see, you give "something" to ``array``, and it manages to build an array out of it. With our signatures, mypy can only guess that these arrays are of type ``ndarray[Any]``. We wrote the signature so you can explicitly state the type of arrays: ::
+As you can see, you give "something" to ``array``, and it manages to build an array out of it. With our signatures, mypy can only guess that these arrays are of type ``ndarray[Any]``. We wrote the signature so you can explicitly state the type of arrays:
+
+.. code-block:: python
 
   my_array = numpy.array([1.0, 2.0, 3.0])  # type: numpy.array[float]
 
