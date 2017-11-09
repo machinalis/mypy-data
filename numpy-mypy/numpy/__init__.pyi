@@ -441,6 +441,9 @@ class ndarray(_ArrayLike[_S], Generic[_S]):
 def array(object: Any, dtype: Any=None, copy: bool=True,
           order: str=None, subok: bool=False,
           ndmin: int=0) -> ndarray[Any]: ...
+def arange(start: Union[int, float]=None, stop: Union[int, float],
+           step: Union[int, flaot]=None,
+           dtype: DtypeType=None) -> ndarray[Union[int, float]]: ...
 def asarray(a: Any, dtype: DtypeType=None, order: str=None) -> ndarray[Any]: ...
 def asanyarray(a: Any, dtype: DtypeType=None, order: str=None) -> ndarray[Any]: ...  # TODO figure out a way to restrict the return type
 def asmatrix(data: Any, dtype: DtypeType=None) -> Any: ...  # TODO define matrix
