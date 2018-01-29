@@ -20,7 +20,7 @@ We've defined the interface for ``numpy.ndarray`` with a type parameter that all
 
 Afterwards you can operate with the array as usual. For the moment being, due to some limitations (listed below), you'll have to declare the type of the array explicitly.
 
-In order to run mypy against your numpy based code, you need to download the numpy-mypy stub and put its contents in a folder (we recommend naming the folder ``stubs`` as per mypy's documentation suggestion). Once there, you can check your code setting the ``MYPYPATH`` environment variable: ::
+In order to run mypy against your numpy based code, you need to download the numpy-mypy stub (the ``numpy`` folder) and put it in a folder (we recommend naming the folder ``stubs`` as per mypy's documentation suggestion). Once there, you can check your code setting the ``MYPYPATH`` environment variable: ::
 
   MYPYPATH=stubs/ mypy my_program.py
   test_numpy.py:8: error: Argument 1 to "do_something" has incompatible type ndarray[float]; expected ndarray[bool]
