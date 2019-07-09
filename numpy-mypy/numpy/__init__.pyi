@@ -48,6 +48,7 @@ DtypeType = Union[dtype, type]
 class flatiter(Generic[_S], Iterator[_S]):
     coords = ...  # type: ShapeType
     def copy(self) -> flatiter[_S]: ...
+    def __next__(self) -> _S: ...
 
 class _ArrayLike(Generic[_S]):
     """
